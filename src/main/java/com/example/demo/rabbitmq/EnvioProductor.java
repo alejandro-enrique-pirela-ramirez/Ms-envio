@@ -7,15 +7,18 @@ import com.example.demo.bean.dto.EnvioRequestDto;
 import com.example.demo.bean.event.EnvioFacturaEvent;
 import com.example.demo.config.RabbitMqConfig;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class EnvioProductor {
 
     private final RabbitTemplate rabbitTemplate;
+
+    public EnvioProductor(RabbitTemplate rabbitTemplate) {
+        super();
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
     public void publicarEnvio(EnvioRequestDto request) {
         EnvioFacturaEvent event = new EnvioFacturaEvent(request.getIdFactura(), request.getCorreo());

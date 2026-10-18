@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido realizado</title>
+</head>
+
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:Arial,Helvetica,sans-serif;color:#1e293b;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#f1f5f9;">
+        <tr>
+            <td align="center" style="padding:24px 12px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                    style="max-width:680px;background-color:#ffffff;border:1px solid #e2e8f0;border-radius:12px;">
+                    <tr>
+                        <td style="padding:28px 24px;background-color:#0f172a;border-radius:12px 12px 0 0;">
+                            <h1 style="margin:0;font-size:28px;color:#ffffff;">Pedido realizado</h1>
+                            <p style="margin:10px 0 0;font-size:14px;color:#cbd5e1;">Hemos recibido su pedido. Aquí
+                                encontrará el detalle de su compra.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:24px;">
+                            <h2 style="margin:0 0 12px;font-size:18px;">Datos del cliente</h2>
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="6"
+                                style="font-size:14px;">
+                                <tr>
+                                    <td style="color:#64748b;">Nombre / Razón social</td>
+                                    <td th:text="${factura.clienteDenominacion ?: 'No disponible'}">Cliente</td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#64748b;">Documento de identidad / RUC</td>
+                                    <td th:text="${factura.clienteNumeroDocumento ?: 'No disponible'}">Documento</td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#64748b;">Correo de envío</td>
+                                    <td style="word-break:break-word;" th:text="${correo}">cliente@ejemplo.com</td>
+                                </tr>
+                            </table>
+
+                            <h2 style="margin:28px 0 12px;font-size:18px;">Productos y cantidades pedidas</h2>
+                            <table width="100%" cellspacing="0" cellpadding="8"
+                                style="border-collapse:collapse;font-size:13px;">
+                                <thead>
+                                    <tr style="background-color:#e2e8f0;">
+                                        <th scope="col" align="left">Producto</th>
+                                        <th scope="col" align="right">Cantidad</th>
+                                        <th scope="col" align="right">Valor unitario (sin IGV)</th>
+                                        <th scope="col" align="right">Importe</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="detalle : ${factura.detalles}"
+                                        style="border-bottom:1px solid #e2e8f0;">
+                                        <td>
+                                            <strong
+                                                th:text="${detalle.descripcion ?: 'Producto sin descripción'}">Producto</strong><br>
+                                            <span style="font-size:12px;color:#64748b;"
+                                                th:text="${detalle.codigoProducto ?: 'Sin código'}">Código</span>
+                                            <span style="font-size:12px;color:#64748b;"
+                                                th:text="${detalle.unidadMedida != null ? ' / ' + detalle.unidadMedida : ''}">Unidad</span>
+                                        </td>
+                                        <td align="right"
+                                            th:text="${detalle.cantidad != null ? detalle.cantidad.stripTrailingZeros().toPlainString() : 'No disponible'}">
+                                            1</td>
+                                        <td align="right"
+                                            th:text="${detalle.valorUnitario != null ? #numbers.formatDecimal(detalle.valorUnitario, 1, 2) : 'No disponible'}">
+                                            0.00</td>
+                                        <td align="right"
+                                            th:text="${detalle.total != null ? #numbers.formatDecimal(detalle.total, 1, 2) : 'No disponible'}">
+                                            0.00</td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(factura.detalles)}">
+                                        <td colspan="4" style="padding:16px 8px;color:#64748b;">No hay detalle de
+                                            productos disponible.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h2 style="margin:28px 0 12px;font-size:18px;">Monto total</h2>
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="8"
+                                style="font-size:14px;">
+                                <tr>
+                                    <td>Moneda</td>
+                                    <td align="right" th:text="${factura.moneda ?: 'No disponible'}">PEN</td>
+                                </tr>
+                                <tr>
+                                    <td>Subtotal</td>
+                                    <td align="right"
+                                        th:text="${factura.subtotal != null ? #numbers.formatDecimal(factura.subtotal, 1, 2) : 'No disponible'}">
+                                        0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>IGV</td>
+                                    <td align="right"
+                                        th:text="${factura.igv != null ? #numbers.formatDecimal(factura.igv, 1, 2) : 'No disponible'}">
+                                        0.00</td>
+                                </tr>
+                                <tr style="background-color:#ecfdf5;font-size:18px;color:#065f46;">
+                                    <td><strong>Total del pedido</strong></td>
+                                    <td align="right"><strong
+                                            th:text="${factura.total != null ? #numbers.formatDecimal(factura.total, 1, 2) : 'No disponible'}">0.00</strong>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <h2 style="margin:28px 0 12px;font-size:18px;">Datos de la factura</h2>
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="6"
+                                style="font-size:14px;">
+                                <tr>
+                                    <td style="color:#64748b;">Serie y número</td>
+                                    <td
+                                        th:text="${factura.serie != null and factura.numero != null ? factura.serie + '-' + factura.numero : 'No disponible'}">
+                                        F001-1</td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#64748b;">Fecha de emisión</td>
+                                    <td th:text="${factura.fechaEmision ?: 'No disponible'}">Fecha</td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#64748b;">Estado</td>
+                                    <td th:text="${factura.estado ?: 'No disponible'}">Estado</td>
+                                </tr>
+                            </table>
+                            <p style="margin:12px 0 0;font-size:13px;color:#64748b;">Adjuntamos su factura electrónica
+                                en formato PDF.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td
+                            style="padding:24px;background-color:#f8fafc;border-top:1px solid #e2e8f0;border-radius:0 0 12px 12px;">
+                            <p style="margin:0;font-size:15px;line-height:1.6;">Muchas gracias por su pedido, estaremos
+                                contactándonos con usted para el cobro y entrega de los productos.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

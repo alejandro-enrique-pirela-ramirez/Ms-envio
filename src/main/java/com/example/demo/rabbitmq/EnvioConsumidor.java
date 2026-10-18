@@ -9,16 +9,20 @@ import com.example.demo.client.FacturaClient;
 import com.example.demo.config.RabbitMqConfig;
 import com.example.demo.service.CorreoService;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class EnvioConsumidor {
 
     private final FacturaClient facturaClient;
     private final CorreoService correoService;
+
+    public EnvioConsumidor(FacturaClient facturaClient, CorreoService correoService) {
+        super();
+        this.facturaClient = facturaClient;
+        this.correoService = correoService;
+    }
 
     @RabbitListener(queues = RabbitMqConfig.QUEUE_ENVIAR)
     public void enviar(EnvioFacturaEvent event) {
@@ -29,7 +33,7 @@ public class EnvioConsumidor {
             return;
         }
 
-        correoService.enviarFactura(event.correo(), event.idFactura(), factura.getUrlPdf());
+        correoService.enviarFactura(event.correo(), factura);
         log.info("factura {} enviada a {}", event.idFactura(), event.correo());
     }
 }
